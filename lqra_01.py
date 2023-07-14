@@ -10,6 +10,8 @@ import streamlit as st
 from utils import *
 
 st.set_page_config(page_title='QSRA lognos', page_icon='lognos_log_01.png', layout='wide' , initial_sidebar_state= 'collapsed' , menu_items={'Get Help': 'https://vcubo.co/contact','Report a bug': "https://vcubo.co/contact",'About': " Unbiased risk ananlysis. *vcubo*"})
+with open('style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # MODEL #
 ## Underlying distriburion (modeling & regression results) / link to private repository pending
