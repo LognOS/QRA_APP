@@ -4,9 +4,6 @@ import pandas as pd
 import scipy as sp
 import scipy.stats
 import time
-import pandas_profiling
-from streamlit_pandas_profiling import st_profile_report
-#from pycaret.regression import setup #, compare_models, pull, save_model
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
