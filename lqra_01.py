@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 from utils import *
-from ml_test_01 import *
+#from ml_test_01 import *
 
 st.set_page_config(page_title='QSRA lognos', page_icon='lognos_log_01.png', layout='wide' , initial_sidebar_state= 'collapsed' , menu_items={'Get Help': 'https://vcubo.co/contact','Report a bug': "https://vcubo.co/contact",'About': " Unbiased risk ananlysis. *vcubo*"})
 # with open('style.css') as f:
