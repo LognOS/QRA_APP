@@ -4,4 +4,5 @@ plotly
 scipy
 streamlit_analytics
 ipywidgets>=7.0.0
+sklearn
 
