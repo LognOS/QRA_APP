@@ -22,11 +22,11 @@ def import_df(path):
 # Decomposition of impacts considering a model and coefficients:
 def partials (df, df_coef, df_part_index):
     #Calculate the partial impact estimate of each parameter/variable for each project according to model's resulting coefficients
-    df_part = pd.DataFrame([df_coef['COUNTRY']*(df['COUNTRY_RMEAN']),
-                           df_coef['LOB']*(df['LOB_RMEAN']),
-                           df_coef['SITE']*(df['SITE_RMEAN']),
-                           df_coef['PSIZE']*(df['PSIZE_RMEAN']),
-                           df_coef['CSIZE']*(df['CSIZE_RMEAN']),
+    df_part = pd.DataFrame([df_coef['PIONEER']*(df['PIONEER_RMEAN']),
+                           df_coef['COMPLEX']*(df['COMPLEX_RMEAN']),
+                           df_coef['DEFINITION']*(df['DEFINITION_RMEAN']),
+                           df_coef['CONCURRENCY']*(df['CONCURRENCY_RMEAN']),
+                           df_coef['CONTRACT']*(df['CONTRACT_RMEAN']),
                            df_coef['SOC'] * df['SOC_EMEAN']* (df['SOC']-df['SOC_MIT'] *df_coef['MIT_ef']),
                            df_coef['PROC']* df['PROC_EMEAN']*(df['PROC']-df['PROC_MIT']*df_coef['MIT_ef']),
                            df_coef['ENG'] * df['ENG_EMEAN']* (df['ENG']-df['ENG_MIT'] *df_coef['MIT_ef']),
@@ -71,12 +71,13 @@ def df_stats(df):
 ## FILTER-list generator FUNCTION
 def filter_gen(selection, df):
     '''Generates a list of booleans to filter the total list of projects'''
-    filter_list = [i and j and k and l and m for i, j, k, l, m in
-                      zip((df['COUNTRY'] == selection[0])^(selection[0]== 'All'),
-                          (df['LOB'] == selection[1])^(selection[1] == 'All'),
-                          (df['SITE'] == selection[2])^(selection[2] == 'All'),
-                          (df['PR_SIZE'] == selection[3])^(selection[3] == 'All'),
-                          (df['MC_SIZE'] == selection[4])^(selection[4] == 'All'))]
+    filter_list = [i and j and k and l and m and n for i, j, k, l, m, n in
+                      zip((df['PIONEER'] == selection[0])^(selection[0]== 'All'),
+                          (df['COMPLEX'] == selection[1])^(selection[1] == 'All'),
+                          (df['DEFINITION'] == selection[2])^(selection[2] == 'All'),
+                          (df['CONCURRENCY'] == selection[3])^(selection[3] == 'All'),
+                          (df['CONTRACT'] == selection[4])^(selection[4] == 'All'),
+                          (df['QUARTER'] == selection[5])^(selection[5] == 'INITIAL'))]
     return filter_list
 
 ## HISTOGRAM AND BAR CHART GENERATOR
@@ -207,11 +208,11 @@ def fit_probs(list):
     return (p50, p80, len_list, sum, total)
 
 def compute_partials (df, df_part_index, df_coef):
-    df[df_part_index[0]] = df_coef['COUNTRY']*(df['COUNTRY_RMEAN'])
-    df[df_part_index[1]] = df_coef['LOB']*(df['LOB_RMEAN'])
-    df[df_part_index[2]] = df_coef['SITE']*(df['SITE_RMEAN'])
-    df[df_part_index[3]] = df_coef['PSIZE']*(df['PSIZE_RMEAN'])
-    df[df_part_index[4]] = df_coef['CSIZE']*(df['CSIZE_RMEAN'])
+    df[df_part_index[0]] = df_coef['PIONEER']*(df['PIONEER_RMEAN'])
+    df[df_part_index[1]] = df_coef['COMPLEX']*(df['COMPLEX_RMEAN'])
+    df[df_part_index[2]] = df_coef['DEFINITION']*(df['DEFINITION_RMEAN'])
+    df[df_part_index[3]] = df_coef['CONCURRENCY']*(df['CONCURRENCY_RMEAN'])
+    df[df_part_index[4]] = df_coef['CONTRACT']*(df['CONTRACT_RMEAN'])
     df[df_part_index[5]] = df_coef['SOC']*df['SOC_EMEAN']*(df['SOC']-df['SOC_MIT'])*df_coef['MIT_ef']
     df[df_part_index[6]] = df_coef['PROC']*df['PROC_EMEAN']*(df['PROC']-df['PROC_MIT'])*df_coef['MIT_ef']
     df[df_part_index[7]] = df_coef['ENG']*df['ENG_EMEAN']*(df['ENG']-df['ENG_MIT'])*df_coef['MIT_ef']
@@ -242,18 +243,18 @@ def update_impact (df, df_base, mitigation, df_coef):
     df['Weather'] =      df_coef['WEA'] * df_base['WEA_EMEAN'] * (df['WEA']-df['WEA_MIT'] * df_coef['MIT_ef'])
     df['Management'] =   df_coef['MGM'] * df_base['MGM_EMEAN'] * (df['MGM']-df['MGM_MIT'] * df_coef['MIT_ef'])
 
-    df['Country'] =       df_coef['COUNTRY'] * df_base['COUNTRY_RMEAN'] * (1 - mitigation[5]) * df_coef['MIT_ef']
-    df['LoB'] =           df_coef['LOB'] * df_base['LOB_RMEAN'] * (1 - mitigation[6]) * df_coef['MIT_ef']
-    df['Site'] =          df_coef['SITE'] * df_base['SITE_RMEAN'] * (1 - mitigation[7]) * df_coef['MIT_ef']
-    df['Project Size'] =  df_coef['PSIZE'] * df_base['PSIZE_RMEAN'] * (1 - mitigation[8]) * df_coef['MIT_ef']
-    df['Contractor'] =    df_coef['CSIZE'] * df_base['CSIZE_RMEAN'] * (1 - mitigation[9]) * df_coef['MIT_ef']
+    df['PIONEER'] =       df_coef['PIONEER'] * df_base['PIONEER_RMEAN'] * (1 - mitigation[5]) * df_coef['MIT_ef']
+    df['COMPLEX'] =           df_coef['COMPLEX'] * df_base['COMPLEX_RMEAN'] * (1 - mitigation[6]) * df_coef['MIT_ef']
+    df['DEFINITION'] =          df_coef['DEFINITION'] * df_base['DEFINITION_RMEAN'] * (1 - mitigation[7]) * df_coef['MIT_ef']
+    df['Project Size'] =  df_coef['CONCURRENCY'] * df_base['CONCURRENCY_RMEAN'] * (1 - mitigation[8]) * df_coef['MIT_ef']
+    df['Contractor'] =    df_coef['CONTRACT'] * df_base['CONTRACT_RMEAN'] * (1 - mitigation[9]) * df_coef['MIT_ef']
 
     df['DEV_EVE_base'] = df['DEV_EVE']
     df['DEV_RAN_base'] = df['DEV_RAN']
     df['DEV_TOT_base'] = df['DEV_TOT']
 
     df['DEV_EVE'] = df['Social']+df['Procurement']+df['Engineering']+df['Weather']+df['Management']
-    df['DEV_RAN'] = df['Country']+df['LoB']+df['Site']+df['Project Size']+df['Contractor']
+    df['DEV_RAN'] = df['PIONEER']+df['COMPLEX']+df['DEFINITION']+df['Project Size']+df['Contractor']
     df['DEV_TOT'] = (1+df['DEV_EVE'])*(1+df['DEV_RAN'])-1
     return (df, mitigation)
 

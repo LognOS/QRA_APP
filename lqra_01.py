@@ -8,17 +8,18 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 from utils import *
+from ml_test_01 import *
 
 st.set_page_config(page_title='QSRA lognos', page_icon='lognos_log_01.png', layout='wide' , initial_sidebar_state= 'collapsed' , menu_items={'Get Help': 'https://vcubo.co/contact','Report a bug': "https://vcubo.co/contact",'About': " Unbiased risk ananlysis. *vcubo*"})
-with open('style.css') as f:
-    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+# with open('style.css') as f:
+#     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # MODEL #
 ## Underlying distriburion (modeling & regression results) / link to private repository pending
 df_distrib = pd.DataFrame([['lognormal', 0.1, 0.3, -0.3]], columns = ['type', 'mu', 'sigma', 'shift'])
 
 ## Coefficients (modeling & regression results) / link to private repository pending:
-df_coef = {'COUNTRY':0.2,'LOB':0.3,'SITE':0.5,'PSIZE':0.5,'CSIZE':0.05,'SOC':0.09,'PROC':0.45,'ENG':0.37,'WEA':0.2,'MGM':0.07,'MIT_ef':1}
+df_coef = {'PIONEER':0.2,'COMPLEX':0.3,'DEFINITION':0.5,'CONCURRENCY':0.5,'CONTRACT':0.05,'SOC':0.09,'PROC':0.45,'ENG':0.37,'WEA':0.2,'MGM':0.07,'MIT_ef':1}
 
 ## List of variables / dictionary:
 df_part_index = ['Pioneer','Complexity','Definition','Concurrency', 'Contract type ',
@@ -30,9 +31,11 @@ risk_dict = {'Social':['SOC', 'SOC_MIT', 'SOC (NM)' ],
         'Weather':['WEA', 'WEA_MIT', 'WEA (NM)'],
         'Management':['MGM', 'MGM_MIT', 'MGM (NM)']
         }
+features_lists = {'PIONEER': ['All', 'YES', 'NO'], 'COMPLEX':['All', '1 - 2', '3 - 4', '5 - 6', '7+'], 'DEFINE':['All', '<20%', '20% - 40%', '40% - 60%', '60% - 80%', '>80%'], 'CONCUR':['All', '>0%', '0% - 20%','20% - 40%', '40% - 60%', '60% - 80%', '>80%'], 'CONTRACT':['All','FIXED', 'OTHER'], 'PROGRESS':['INITIAL', 'Q1', 'Q2', 'Q3', 'Q4']}
 
 # DATA IMPORT #
-db_raw_path = 'https://raw.githubusercontent.com/vcubo/beta_0.1/main/VCDB_221007v3.csv'
+# db_raw_path = 'https://raw.githubusercontent.com/vcubo/beta_0.1/main/VCDB_221007v3.csv'
+db_raw_path = 'https://raw.githubusercontent.com/vcubo/beta_0.1/main/VCDB_230731v5_beta.csv'
 
 
 #df = import_df(db_raw_path) # main dataframe for general use
@@ -43,29 +46,31 @@ st.session_state.df = import_df(db_raw_path) # secondary dataframe for individua
 st.write("**PROJECT SETUP**")
 with st.form('project_setup'):
     #Initialization of characteristics variables (parameters):
-    prf01, prf02, prf03, prf04, prf05, prf06 = st.columns(6)
-    if 'select_country2' not in st.session_state: st.session_state.select_country2 = "All"
-    if 'select_lob2' not in st.session_state: st.session_state.select_lob2 = "All"
-    if 'select_site2' not in st.session_state: st.session_state.select_site2 = "All"
-    if 'select_prsize2' not in st.session_state: st.session_state.select_prsize2 = "All"
-    if 'select_csize2' not in st.session_state: st.session_state.select_csize2 = "All"
+    prf01, prf02, prf03, prf04, prf05, prf06, prf07 = st.columns(7)
+    if 'select_PIONEER2' not in st.session_state: st.session_state.select_PIONEER2 = "All"
+    if 'select_COMPLEXITY2' not in st.session_state: st.session_state.select_COMPLEXITY2 = "All"
+    if 'select_DEFINITION2' not in st.session_state: st.session_state.select_DEFINITION2 = "All"
+    if 'select_CONCURRENCY2' not in st.session_state: st.session_state.select_CONCURRENCY2 = "All"
+    if 'select_CONTRACT2' not in st.session_state: st.session_state.select_CONTRACT2 = "All"
+    if 'select_progress2' not in st.session_state: st.session_state.select_progress2 = "INITIAL"
     if 'hist_xbin_size2' not in st.session_state: st.session_state.hist_xbin_size2 = 0.02
     
 
     #Generate list of unique values for each parameter in the db. User selection is stored in initialized variables
-    with prf01: st.selectbox('PIONEER PLANT',['All']+st.session_state.df['COUNTRY'].unique().tolist(), key='select_country2')
-    with prf02: st.selectbox('COMPLEXITY',['All']+st.session_state.df['LOB'].unique().tolist(), key='select_lob2')
-    with prf03: st.selectbox('LEVEL OF DEFINITION',['All']+st.session_state.df['SITE'].unique().tolist(), key='select_site2')
-    with prf04: st.selectbox('CONCURRENCY',['All']+st.session_state.df['PR_SIZE'].unique().tolist(), key='select_prsize2')
-    with prf05: st.selectbox('CONTRACT TYPE',['All']+st.session_state.df['MC_SIZE'].unique().tolist(), key='select_csize2')
-    with prf06: st.slider('Histograms bin width', 0.01, 0.1, key='hist_xbin_size2')
+    with prf01: st.selectbox('PIONEER PLANT',features_lists['PIONEER'], key='select_PIONEER2')
+    with prf02: st.selectbox('COMPLEXITY',features_lists['COMPLEX'], key='select_COMPLEXITY2')
+    with prf03: st.selectbox('LEVEL OF DEFINITION',features_lists['DEFINE'], key='select_DEFINITION2')
+    with prf04: st.selectbox('CONCURRENCY',features_lists['CONCUR'], key='select_CONCURRENCY2')
+    with prf05: st.selectbox('CONTRACT TYPE',features_lists['CONTRACT'], key='select_CONTRACT2')
+    with prf06: st.selectbox('PROJECT PROGRESS', features_lists['PROGRESS'], key='select_progress2')
+    with prf07: st.slider('Histograms bin width', 0.01, 0.1, key='hist_xbin_size2')
 
     if 'df_pre' not in st.session_state: st.session_state.df_pre = st.session_state.df.copy(deep=True)
     #Applying filters:
     setup_project = st.form_submit_button('SET UP PROJECT')
     if setup_project:
         # generate list of filters applied:
-        st.session_state.selection_pro = [st.session_state.select_country2, st.session_state.select_lob2, st.session_state.select_site2, st.session_state.select_prsize2, st.session_state.select_csize2]
+        st.session_state.selection_pro = [st.session_state.select_PIONEER2, st.session_state.select_COMPLEXITY2, st.session_state.select_DEFINITION2, st.session_state.select_CONCURRENCY2, st.session_state.select_CONTRACT2, st.session_state.select_progress2]
         # generate boolean list to apply filters to projects list:
         st.session_state.filter_list2 = filter_gen(st.session_state.selection_pro,st.session_state.df)
         # copy of df with the boolean list filter applied:
@@ -105,7 +110,6 @@ with st.form('project_setup'):
 
             st.caption('**Lognormal fit** P50: '+str(np.round(fit_probs(st.session_state.figures_p1_fit[5])[0]*100,1))+'%. P80: '+str(np.round(fit_probs(st.session_state.figures_p1_fit[5])[1]*100,1))+'%. Approx. uncertainty impact: '+str(np.round((st.session_state.pre_stat['factors'][0]-1)*100,0))+'%. Approx. risks impact: '+str(np.round((st.session_state.pre_stat['factors'][1]-1)*100,0))+'% (based on '+str(len(st.session_state.df_pre))+' data points)')
            
-            
             st.caption('')
 
         # with pr02b:
@@ -124,6 +128,13 @@ with st.form('project_setup'):
             st.plotly_chart(figures_pre[2], use_container_width=True)
             #st.subheader('Lognormal fitting to modeled distribution:')
             #st.plotly_chart(st.session_state.figures_p1_fit[0], use_container_width=True)
+        with pr02a:
+            # ml_results = predict_features (st.session_state.df_pre, st.session_state.models[0], st.session_state.models[1])
+
+            # features = ['Q1', 'YES', '1 - 2', '<20%', '<0%', 'OTHER']
+            # predictions = predict_features(features)
+            st.write("**PROJECT RISK QUANTIFICATION**")
+
 
 var_corr = st.expander('CORRELATION ANALYSIS', expanded=False)
 with var_corr:
