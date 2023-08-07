@@ -18,6 +18,7 @@ import time
 
 
 # Function to train a random forest model
+st.cache_data()
 def train_rf(X_train, y_train, n_estimators=100, random_state=42):
     rf = RandomForestRegressor(n_estimators=n_estimators, random_state=random_state)
     X_train = preprocess_data(X_train)
@@ -25,11 +26,13 @@ def train_rf(X_train, y_train, n_estimators=100, random_state=42):
     return rf
 
 # Function to make predictions and compute RMSE
+st.cache_data()
 def predict_and_evaluate(rf, X_test, y_test):
     y_pred = rf.predict(X_test)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     return y_pred, rmse
 
+st.cache_data()
 def preprocess_data(X_train):
     imputer = SimpleImputer(missing_values=np.nan, strategy='mean')
     imputer = imputer.fit(X_train)
@@ -39,6 +42,7 @@ def preprocess_data(X_train):
 
 
 # Function to convert models dict to bytes
+st.cache_data()
 def convert_models_to_bytes(models_dict):
     """
     Convert models dictionary to bytes using joblib and io.BytesIO
@@ -124,6 +128,7 @@ def two_steps_ml(df_base):
     st.caption(f'Completed training in **{np.round(time.time()-start,2)} seconds**')
     return [models, encoder]
 
+st.cache_data()
 def predict_features(feature_values, rf_models, enc):
     # Create a dataframe from the provided feature values (reshaped to 1 row and n columns)
     X_new = pd.DataFrame(np.array(feature_values).reshape(1, -1), columns=['QUARTER', 'COUNTRY', 'LOB', 'SITE', 'PR_SIZE', 'MC_SIZE'])

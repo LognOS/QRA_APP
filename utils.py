@@ -20,6 +20,7 @@ def import_df(path):
 
 # FUNCTIONS 
 # Decomposition of impacts considering a model and coefficients:
+st.cache_data()
 def partials (df, df_coef, df_part_index):
     #Calculate the partial impact estimate of each parameter/variable for each project according to model's resulting coefficients
     df_part = pd.DataFrame([df_coef['PIONEER']*(df['PIONEER_RMEAN']),
@@ -56,6 +57,7 @@ def partials (df, df_coef, df_part_index):
 
 ## Statistics function (mean, median, etc)
 decimals = 4 #decimals shown in results
+st.cache_data()
 def df_stats(df):
     '''Creates a dictionary with the statistics for DEV_RAN(uncertainty deviation median ), DEV_EVE(risks deviation median) and DEV_TOT (total deviation median)'''
     DEV_mean = [np.round(np.mean(df['DEV_RAN']),decimals), np.round(np.mean(df['DEV_EVE']),decimals), np.round(np.mean(df['DEV_TOT']),decimals)]
@@ -81,7 +83,7 @@ def filter_gen(selection, df):
     return filter_list
 
 ## HISTOGRAM AND BAR CHART GENERATOR
-
+st.cache_data()
 def const_figures(df_base,df_comp, hist_xbins_size, df_coef, df_part_index):
     ''' df_base: baseline dataframe.
     df_comp: modified dataframe of projects similar to the one to be evaluated (filters applied) 
@@ -139,6 +141,7 @@ def const_figures(df_base,df_comp, hist_xbins_size, df_coef, df_part_index):
     return [g_dev_hist1,g_dev_hist2,dev_comp_bar]
 
 ## DISTRIBUTION FITTING
+st.cache_data()
 def fit_distr(df, hist_xbins_size):
     '''Generates lognormal pdf and cdf fitting total deviation data'''
     main_param_c1 = sp.stats.lognorm.fit(df['DEV_TOT'])
@@ -207,6 +210,7 @@ def fit_probs(list):
             break
     return (p50, p80, len_list, sum, total)
 
+st.cache_data()
 def compute_partials (df, df_part_index, df_coef):
     df[df_part_index[0]] = df_coef['PIONEER']*(df['PIONEER_RMEAN'])
     df[df_part_index[1]] = df_coef['COMPLEX']*(df['COMPLEX_RMEAN'])
@@ -268,6 +272,7 @@ def scatter_hist (df, x_sel, title):
      title =title)
     return fig_c
 
+st.cache_data()
 def classify_correlation(sel_dev_corr):
     correlation, p_value = sel_dev_corr
     correlation = abs(correlation)  # Take absolute value to handle negative correlations
